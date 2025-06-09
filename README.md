@@ -36,6 +36,636 @@ This API covers all specified functionalities, including:
 * **Code Quality:** Use of collections, appropriate data types, and clear conditional logic as per best practices.
 
 ---
+---
+
+## 📝 API Endpoints Detailed Documentation
+
+All endpoints are served under the base URL `http://localhost:8080`.
+
+---
+
+### **1. Department Endpoints**
+
+#### **1.1. Create a New Department**
+
+* **Purpose:** To add a new department to the system.
+* **URL:** `/api/departments`
+* **Method:** `POST`
+* **Request Body (`application/json`):** `DepartmentCreateRequestDTO`
+    ```json
+    {
+      "name": "Quality Assurance",
+      "creationDate": "2023-11-01",
+      "departmentHeadId": 50 // Optional: ID of an existing employee to be the head
+    }
+    ```
+* **Response Body (`application/json`):** `DepartmentResponseDTO` (HTTP Status: `201 Created`)
+    ```json
+    {
+      "id": 101,
+      "name": "Quality Assurance",
+      "creationDate": "2023-11-01",
+      "departmentHead": {
+        "id": 50,
+        "name": "John Doe",
+        "role": "QA Lead"
+      }
+    }
+    ```
+* **Error Responses:**
+    * `400 Bad Request`: If `name` or `creationDate` are missing/invalid, or if `departmentHeadId` refers to a non-existent employee.
+    * `409 Conflict`: If a department with the given `name` already exists.
+
+#### **1.2. Get All Departments**
+
+* **Purpose:** To retrieve a paginated list of all departments. Can optionally expand to include associated employees.
+* **URL:** `/api/departments`
+* **Method:** `GET`
+* **Query Parameters:**
+    * `page` (optional): `int`, default `0`. The page number to retrieve (0-indexed).
+    * `size` (optional): `int`, default `20`. The number of items per page.
+    * `expand` (optional): `String`, set to `"employee"` to include a list of employees in each department's response.
+* **Response Body (`application/json`):** `PagedResponse<DepartmentResponseDTO>`
+    *(Without `expand=employee`)*
+    ```json
+    {
+      "content": [
+        {
+          "id": 1,
+          "name": "Human Resources",
+          "creationDate": "2020-01-15",
+          "departmentHead": {
+            "id": 3,
+            "name": "Carol White",
+            "role": "HR Director"
+          }
+        },
+        {
+          "id": 2,
+          "name": "Engineering",
+          "creationDate": "2019-05-20",
+          "departmentHead": {
+            "id": 2,
+            "name": "Bob Johnson",
+            "role": "CTO"
+          }
+        }
+      ],
+      "pageNo": 0,
+      "pageSize": 20,
+      "totalElements": 5,
+      "totalPages": 1,
+      "last": true
+    }
+    ```
+    *(With `expand=employee`)*
+    ```json
+    {
+      "content": [
+        {
+          "id": 1,
+          "name": "Human Resources",
+          "creationDate": "2020-01-15",
+          "departmentHead": {
+            "id": 3,
+            "name": "Carol White",
+            "role": "HR Director"
+          },
+          "employees": [
+            {
+              "id": 3,
+              "name": "Carol White",
+              "dateOfBirth": "1978-07-05",
+              "salary": 150000.00,
+              "address": "789 Pine Ln",
+              "role": "HR Director",
+              "joiningDate": "2015-02-01",
+              "yearlyBonusPercentage": 8.0,
+              "reportingManagerName": "Alice Smith"
+            },
+            {
+              "id": 10,
+              "name": "Employee 7",
+              "dateOfBirth": "1994-09-20",
+              "salary": 85000.00,
+              "address": "c8d45f44 St",
+              "role": "Associate",
+              "joiningDate": "2022-07-10",
+              "yearlyBonusPercentage": 5.5,
+              "reportingManagerName": "Carol White"
+            }
+            // ... more employees
+          ]
+        }
+        // ... more departments
+      ],
+      "pageNo": 0,
+      "pageSize": 20,
+      "totalElements": 5,
+      "totalPages": 1,
+      "last": true
+    }
+    ```
+
+#### **1.3. Get Department by ID**
+
+* **Purpose:** To retrieve details for a specific department by its ID. Can optionally expand to include associated employees.
+* **URL:** `/api/departments/{id}`
+* **Method:** `GET`
+* **Path Parameter:** `{id}`: `long`, The ID of the department.
+* **Query Parameter:**
+    * `expand` (optional): `String`, set to `"employee"` to include a list of employees under this department.
+* **Response Body (`application/json`):** `DepartmentResponseDTO` (HTTP Status: `200 OK`)
+    *(Without `expand=employee`)*
+    ```json
+    {
+      "id": 1,
+      "name": "Human Resources",
+      "creationDate": "2020-01-15",
+      "departmentHead": {
+        "id": 3,
+        "name": "Carol White",
+        "role": "HR Director"
+      }
+    }
+    ```
+    *(With `expand=employee`)*
+    ```json
+    {
+      "id": 1,
+      "name": "Human Resources",
+      "creationDate": "2020-01-15",
+      "departmentHead": {
+        "id": 3,
+        "name": "Carol White",
+        "role": "HR Director"
+      },
+      "employees": [
+        {
+          "id": 3,
+          "name": "Carol White",
+          "dateOfBirth": "1978-07-05",
+          "salary": 150000.00,
+          "address": "789 Pine Ln",
+          "role": "HR Director",
+          "joiningDate": "2015-02-01",
+          "yearlyBonusPercentage": 8.0,
+          "reportingManagerName": "Alice Smith"
+        },
+        {
+          "id": 10,
+          "name": "Employee 7",
+          "dateOfBirth": "1994-09-20",
+          "salary": 85000.00,
+          "address": "c8d45f44 St",
+          "role": "Associate",
+          "joiningDate": "2022-07-10",
+          "yearlyBonusPercentage": 5.5,
+          "reportingManagerName": "Carol White"
+        }
+      ]
+    }
+    ```
+* **Error Responses:**
+    * `404 Not Found`: If no department exists with the given ID.
+
+#### **1.4. Update Department Details**
+
+* **Purpose:** To modify details of an existing department.
+* **URL:** `/api/departments/{id}`
+* **Method:** `PUT`
+* **Path Parameter:** `{id}`: `long`, The ID of the department to update.
+* **Request Body (`application/json`):** `DepartmentUpdateRequestDTO`
+    ```json
+    {
+      "name": "HR Operations",
+      "creationDate": "2020-01-15", // Can be the same or updated
+      "departmentHeadId": 51 // Optional: New department head ID, null to remove head
+    }
+    ```
+* **Response Body (`application/json`):** `DepartmentResponseDTO` (HTTP Status: `200 OK`)
+    ```json
+    {
+      "id": 1,
+      "name": "HR Operations",
+      "creationDate": "2020-01-15",
+      "departmentHead": {
+        "id": 51,
+        "name": "Jane Doe",
+        "role": "HR Manager"
+      }
+    }
+    ```
+* **Error Responses:**
+    * `400 Bad Request`: If request body is invalid or `departmentHeadId` refers to a non-existent employee.
+    * `404 Not Found`: If no department exists with the given ID.
+    * `409 Conflict`: If the new `name` conflicts with an existing department name.
+
+#### **1.5. Delete a Department**
+
+* **Purpose:** To remove a department from the system. Fails if employees are assigned.
+* **URL:** `/api/departments/{id}`
+* **Method:** `DELETE`
+* **Path Parameter:** `{id}`: `long`, The ID of the department to delete.
+* **Response Body:** (No Content, HTTP Status: `204 No Content`)
+* **Error Responses:**
+    * `404 Not Found`: If no department exists with the given ID.
+    * `400 Bad Request`: If the department has associated employees (e.g., `message: "Cannot delete department with ID: X as it still has assigned employees."`).
+
+---
+
+### **2. Employee Endpoints**
+
+#### **2.1. Create a New Employee**
+
+* **Purpose:** To add a new employee to the system.
+* **URL:** `/api/employees`
+* **Method:** `POST`
+* **Request Body (`application/json`):** `EmployeeCreateRequestDTO`
+    ```json
+    {
+      "name": "Michael Brown",
+      "dateOfBirth": "1995-03-22",
+      "salary": 75000.00,
+      "departmentId": 2,             // Optional: ID of an existing department
+      "address": "101 Elm St",
+      "role": "Junior Developer",
+      "joiningDate": "2024-01-15",
+      "yearlyBonusPercentage": 5.0,
+      "reportingManagerId": 2        // Optional: ID of an existing employee (manager)
+    }
+    ```
+* **Response Body (`application/json`):** `EmployeeResponseDTO` (HTTP Status: `201 Created`)
+    ```json
+    {
+      "id": 105,
+      "name": "Michael Brown",
+      "dateOfBirth": "1995-03-22",
+      "salary": 75000.00,
+      "department": {
+        "id": 2,
+        "name": "Engineering"
+      },
+      "address": "101 Elm St",
+      "role": "Junior Developer",
+      "joiningDate": "2024-01-15",
+      "yearlyBonusPercentage": 5.0,
+      "reportingManager": {
+        "id": 2,
+        "name": "Bob Johnson",
+        "role": "CTO"
+      },
+      "reportingManagerName": "Bob Johnson"
+    }
+    ```
+* **Error Responses:**
+    * `400 Bad Request`: If any required fields are missing/invalid, `departmentId` or `reportingManagerId` refer to non-existent entities.
+    * `400 Bad Request`: If `reportingManagerId` is the same as the employee being created (self-referencing logic error).
+
+#### **2.2. Get All Employees**
+
+* **Purpose:** To retrieve a paginated list of all employees. Can optionally return only names and IDs.
+* **URL:** `/api/employees`
+* **Method:** `GET`
+* **Query Parameters:**
+    * `page` (optional): `int`, default `0`. The page number to retrieve (0-indexed).
+    * `size` (optional): `int`, default `20`. The number of items per page.
+    * `lookup` (optional): `boolean`, set to `true` to return `EmployeeLookupDTO` (only `id` and `name`).
+* **Response Body (`application/json`):** `PagedResponse<EmployeeResponseDTO>` or `PagedResponse<EmployeeLookupDTO>`
+    *(Without `lookup=true`)*
+    ```json
+    {
+      "content": [
+        {
+          "id": 1,
+          "name": "Alice Smith",
+          "dateOfBirth": "1980-01-01",
+          "salary": 200000.00,
+          "department": null,
+          "address": "123 Main St",
+          "role": "CEO",
+          "joiningDate": "2010-01-01",
+          "yearlyBonusPercentage": 10.0,
+          "reportingManager": null,
+          "reportingManagerName": null
+        },
+        {
+          "id": 2,
+          "name": "Bob Johnson",
+          "dateOfBirth": "1982-03-10",
+          "salary": 180000.00,
+          "department": {
+            "id": 2,
+            "name": "Engineering"
+          },
+          "address": "456 Oak Ave",
+          "role": "CTO",
+          "joiningDate": "2012-06-01",
+          "yearlyBonusPercentage": 9.0,
+          "reportingManager": {
+            "id": 1,
+            "name": "Alice Smith",
+            "role": "CEO"
+          },
+          "reportingManagerName": "Alice Smith"
+        }
+      ],
+      "pageNo": 0,
+      "pageSize": 20,
+      "totalElements": 25,
+      "totalPages": 2,
+      "last": false
+    }
+    ```
+    *(With `lookup=true`)*
+    ```json
+    {
+      "content": [
+        {
+          "id": 1,
+          "name": "Alice Smith"
+        },
+        {
+          "id": 2,
+          "name": "Bob Johnson"
+        },
+        {
+          "id": 3,
+          "name": "Carol White"
+        }
+        // ... more employees
+      ],
+      "pageNo": 0,
+      "pageSize": 20,
+      "totalElements": 25,
+      "totalPages": 2,
+      "last": false
+    }
+    ```
+
+#### **2.3. Get Employee by ID**
+
+* **Purpose:** To retrieve detailed information for a specific employee by their ID.
+* **URL:** `/api/employees/{id}`
+* **Method:** `GET`
+* **Path Parameter:** `{id}`: `long`, The ID of the employee to retrieve.
+* **Response Body (`application/json`):** `EmployeeResponseDTO` (HTTP Status: `200 OK`)
+    ```json
+    {
+      "id": 2,
+      "name": "Bob Johnson",
+      "dateOfBirth": "1982-03-10",
+      "salary": 180000.00,
+      "department": {
+        "id": 2,
+        "name": "Engineering"
+      },
+      "address": "456 Oak Ave",
+      "role": "CTO",
+      "joiningDate": "2012-06-01",
+      "yearlyBonusPercentage": 9.0,
+      "reportingManager": {
+        "id": 1,
+        "name": "Alice Smith",
+        "role": "CEO"
+      },
+      "reportingManagerName": "Alice Smith"
+    }
+    ```
+* **Error Responses:**
+    * `404 Not Found`: If no employee exists with the given ID.
+
+#### **2.4. Update Employee Details**
+
+* **Purpose:** To modify existing details of an employee.
+* **URL:** `/api/employees/{id}`
+* **Method:** `PUT`
+* **Path Parameter:** `{id}`: `long`, The ID of the employee to update.
+* **Request Body (`application/json`):** `EmployeeUpdateRequestDTO`
+    ```json
+    {
+      "name": "Bob J. Johnson",
+      "dateOfBirth": "1982-03-10",
+      "salary": 190000.00,
+      "departmentId": 2,             // Optional: New department ID, null to remove from department
+      "address": "789 Willow Rd",
+      "role": "Chief Technology Officer",
+      "joiningDate": "2012-06-01",
+      "yearlyBonusPercentage": 9.5,
+      "reportingManagerId": 1        // Optional: New reporting manager ID, null to remove manager
+    }
+    ```
+* **Response Body (`application/json`):** `EmployeeResponseDTO` (HTTP Status: `200 OK`)
+    ```json
+    {
+      "id": 2,
+      "name": "Bob J. Johnson",
+      "dateOfBirth": "1982-03-10",
+      "salary": 190000.00,
+      "department": {
+        "id": 2,
+        "name": "Engineering"
+      },
+      "address": "789 Willow Rd",
+      "role": "Chief Technology Officer",
+      "joiningDate": "2012-06-01",
+      "yearlyBonusPercentage": 9.5,
+      "reportingManager": {
+        "id": 1,
+        "name": "Alice Smith",
+        "role": "CEO"
+      },
+      "reportingManagerName": "Alice Smith"
+    }
+    ```
+* **Error Responses:**
+    * `400 Bad Request`: If request body is invalid, `departmentId` or `reportingManagerId` refer to non-existent entities, or `reportingManagerId` is the same as the employee's own ID.
+    * `404 Not Found`: If no employee exists with the given ID.
+
+#### **2.5. Update Employee's Department**
+
+* **Purpose:** To move an employee from one department to another.
+* **URL:** `/api/employees/{id}/department`
+* **Method:** `PATCH`
+* **Path Parameter:** `{id}`: `long`, The ID of the employee to update.
+* **Request Body (`application/json`):** `EmployeeUpdateDepartmentRequestDTO`
+    ```json
+    {
+      "departmentId": 4 // The ID of the new department, null to remove from current department
+    }
+    ```
+* **Response Body (`application/json`):** `EmployeeResponseDTO` (HTTP Status: `200 OK`)
+    ```json
+    {
+      "id": 5,
+      "name": "Employee 2",
+      "dateOfBirth": "1997-05-18",
+      "salary": 65000.00,
+      "department": {
+        "id": 4,
+        "name": "Marketing"
+      },
+      "address": "f3b9c1d2 St",
+      "role": "Analyst",
+      "joiningDate": "2023-03-01",
+      "yearlyBonusPercentage": 4.0,
+      "reportingManager": {
+        "id": 2,
+        "name": "Bob Johnson",
+        "role": "CTO"
+      },
+      "reportingManagerName": "Bob Johnson"
+    }
+    ```
+* **Error Responses:**
+    * `400 Bad Request`: If `departmentId` is invalid or refers to a non-existent department.
+    * `404 Not Found`: If no employee exists with the given ID.
+
+---
+
+### **3. DTO Schemas (Reference)**
+
+These are the Data Transfer Objects (DTOs) used for API requests and responses. The actual JSON schema can be found in the Swagger UI.
+
+#### **3.1. `DepartmentCreateRequestDTO`**
+
+Used for `POST /api/departments`.
+```json
+{
+  "name": "String",           // @NotBlank
+  "creationDate": "YYYY-MM-DD", // @NotNull, @PastOrPresent
+  "departmentHeadId": 0       // long, optional
+}
+---
+
+
+### **3.2. `DepartmentUpdateRequestDTO`**
+
+
+Used for `PUT /api/departments/{id}`.
+
+```json
+{
+  "name": "String",           // @NotBlank
+  "creationDate": "YYYY-MM-DD", // @NotNull, @PastOrPresent
+  "departmentHeadId": 0       // long, optional (null to remove head)
+}
+
+### **3.3. `DepartmentResponseDTO`**
+
+Used for responses for Department GET/POST/PUT.
+
+JSON
+
+{
+  "id": 0,                    // long
+  "name": "String",
+  "creationDate": "YYYY-MM-DD",
+  "departmentHead": {         // EmployeeLookupDTO, null if no head
+    "id": 0,                  // long
+    "name": "String",
+    "role": "String"
+  },
+  "employees": [              // List<EmployeeResponseDTO>, only if ?expand=employee
+    // ... EmployeeResponseDTO objects
+  ]
+}
+### **3.4. `EmployeeCreateRequestDTO`**
+Used for POST /api/employees.
+
+JSON
+
+{
+  "name": "String",           // @NotBlank
+  "dateOfBirth": "YYYY-MM-DD", // @NotNull, @Past
+  "salary": 0.0,              // @NotNull, @DecimalMin(value = "0.0", inclusive = false)
+  "departmentId": 0,          // long, optional
+  "address": "String",
+  "role": "String",           // @NotBlank
+  "joiningDate": "YYYY-MM-DD", // @NotNull, @PastOrPresent
+  "yearlyBonusPercentage": 0.0, // @NotNull, @DecimalMin(value = "0.0")
+  "reportingManagerId": 0     // long, optional
+}
+### **3.5. `EmployeeUpdateRequestDTO`**
+Used for PUT /api/employees/{id}.
+
+JSON
+
+{
+  "name": "String",           // @NotBlank
+  "dateOfBirth": "YYYY-MM-DD", // @NotNull, @Past
+  "salary": 0.0,              // @NotNull, @DecimalMin(value = "0.0", inclusive = false)
+  "departmentId": 0,          // long, optional (null to remove from department)
+  "address": "String",
+  "role": "String",           // @NotBlank
+  "joiningDate": "YYYY-MM-DD", // @NotNull, @PastOrPresent
+  "yearlyBonusPercentage": 0.0, // @NotNull, @DecimalMin(value = "0.0")
+  "reportingManagerId": 0     // long, optional (null to remove manager)
+}
+
+### **3.6. `EmployeeUpdateDepartmentRequestDTO`**
+Used for PATCH /api/employees/{id}/department.
+
+JSON
+
+{
+  "departmentId": 0           // long, optional (null to remove from department)
+}
+
+### **3.7. `EmployeeResponseDTO`**
+Used for responses for Employee GET/POST/PUT/PATCH.
+
+JSON
+
+{
+  "id": 0,                    // long
+  "name": "String",
+  "dateOfBirth": "YYYY-MM-DD",
+  "salary": 0.0,
+  "department": {             // DepartmentLookupDTO, null if no department
+    "id": 0,
+    "name": "String"
+  },
+  "address": "String",
+  "role": "String",
+  "joiningDate": "YYYY-MM-DD",
+  "yearlyBonusPercentage": 0.0,
+  "reportingManager": {       // EmployeeLookupDTO, null if no manager
+    "id": 0,
+    "name": "String",
+    "role": "String"
+  },
+  "reportingManagerName": "String" // Derived field for convenience
+}
+
+### **3.8. `EmployeeLookupDTO`**
+Used when ?lookup=true for employees, or as a nested object in other DTOs.
+
+JSON
+
+{
+  "id": 0,                    // long
+  "name": "String"
+}
+(Note: when used as departmentHead or reportingManager in DepartmentResponseDTO and EmployeeResponseDTO respectively, the role field is also included).
+
+
+### **3.9. `PagedResponse<T>`**
+Generic wrapper for all paginated GET responses. T would be EmployeeResponseDTO, EmployeeLookupDTO, or DepartmentResponseDTO.
+
+JSON
+
+{
+  "content": [
+    // Array of T objects
+  ],
+  "pageNo": 0,                 // Current page number (0-indexed)
+  "pageSize": 20,              // Items per page
+  "totalElements": 0,          // Total number of elements across all pages
+  "totalPages": 0,             // Total number of available pages
+  "last": true                 // boolean, true if this is the last page
+}
+---
 
 ## 🛠️ Technologies Used
 
@@ -59,7 +689,7 @@ Follow these steps to get the application up and running on your local machine:
     * A good **Integrated Development Environment (IDE)** like IntelliJ IDEA (recommended), VS Code, or Eclipse.
 2.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/](https://github.com/)<your-username>/employee-management-system.git
+    git clone https://github.com/7rensenS/employee-management-system.git
     cd employee-management-system
     ```
     *(Remember to replace `<your-username>` with your actual GitHub username where you've pushed the code.)*
