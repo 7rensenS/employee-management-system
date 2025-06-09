@@ -36,6 +36,113 @@ This API covers all specified functionalities, including:
 * **Code Quality:** Use of collections, appropriate data types, and clear conditional logic as per best practices.
 
 ---
+## 🛠️ Technologies Used
+
+* **Java 17+**: The core programming language.
+* **Spring Boot 3.5.x**: The framework for building robust, stand-alone, production-grade Spring applications.
+* **Spring Data JPA**: For simplified data access and persistence with Hibernate as the JPA provider.
+* **H2 Database**: An in-memory database used for development and testing, easily swappable with external databases like PostgreSQL or MySQL.
+* **Maven**: Dependency management and build automation tool.
+* **Lombok**: Reduces boilerplate code (getters, setters, constructors).
+* **Jakarta Validation (Bean Validation)**: For declarative validation of input data.
+
+---
+
+## ⚙️ Setup and Run
+
+Follow these steps to get the application up and running on your local machine:
+
+1.  **Prerequisites:**
+    * **Java Development Kit (JDK) 17 or higher** installed.
+    * **Maven** installed (usually comes bundled with modern IDEs like IntelliJ IDEA).
+    * A good **Integrated Development Environment (IDE)** like IntelliJ IDEA (recommended), VS Code, or Eclipse.
+2.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/7rensenS/employee-management-system.git
+    cd employee-management-system
+    ```
+    *(Remember to replace `<your-username>` with your actual GitHub username where you've pushed the code.)*
+3.  **Build the Project:**
+    Navigate to the project root directory in your terminal and run the Maven build command:
+    ```bash
+    mvn clean install
+    ```
+    This command compiles the code, runs tests, and packages the application.
+4.  **Run the Application:**
+    You can run the Spring Boot application using Maven:
+    ```bash
+    mvn spring-boot:run
+    ```
+    Alternatively, you can run the `EmployeeManagementSystemApplication.java` file directly from your IDE.
+
+    The application will start on `http://localhost:8080`.
+
+---
+
+## 💾 Database Details
+
+This project uses an **H2 in-memory database** for simplicity and ease of setup during development and assessment. The database schema is automatically created on startup by Spring Data JPA based on the defined entities (`ddl-auto=update` configured in `application.properties`).
+
+### Database Structure
+
+The core entities are `Department` and `Employee`, mapped to `departments` and `employees` tables respectively.
+
+| Column Name               | Data Type         | Constraints                                  | Description                                    |
+| :------------------------ | :---------------- | :------------------------------------------- | :--------------------------------------------- |
+| `id`                      | `BIGINT`          | `PRIMARY KEY`, `AUTO_INCREMENT`              | Unique identifier for the entity               |
+| `name`                    | `VARCHAR(255)`    | `NOT NULL`, `UNIQUE` (for Department)        | Name of the department or employee             |
+| `creation_date`           | `DATE`            | `NOT NULL` (for Department)                  | Date the department was established            |
+| `head_employee_id`        | `BIGINT`          | `FOREIGN KEY REFERENCES employees(id)` (nullable) | ID of the employee designated as department head |
+| `date_of_birth`           | `DATE`            | `NOT NULL` (for Employee)                    | Employee's date of birth                       |
+| `salary`                  | `DECIMAL(19,2)`   | `NOT NULL` (for Employee)                    | Employee's yearly salary                       |
+| `department_id`           | `BIGINT`          | `FOREIGN KEY REFERENCES departments(id)` (nullable) | ID of the department the employee belongs to   |
+| `address`                 | `VARCHAR(255)`    |                                              | Employee's residential address                 |
+| `role`                    | `VARCHAR(255)`    | `NOT NULL` (for Employee)                    | Employee's job role or title                   |
+| `joining_date`            | `DATE`            | `NOT NULL` (for Employee)                    | Date the employee joined the company           |
+| `yearly_bonus_percentage` | `DOUBLE`          | `NOT NULL` (for Employee)                    | Percentage of yearly bonus (e.g., 5.0 for 5%)  |
+| `reporting_manager_id`    | `BIGINT`          | `FOREIGN KEY REFERENCES employees(id)` (nullable) | ID of the employee's reporting manager         |
+
+*(A `.sql` script for creating these tables is not explicitly provided in the repository, as Spring Data JPA automatically generates the schema based on entities for H2. However, the structure is clearly defined above for reference.)*
+
+### H2 Console
+
+You can access the H2 database console to inspect the data directly:
+
+➡️ **[http://localhost:8080/h2-console](http://localhost:8080/h2-console)**
+
+Use the following credentials to connect:
+* **JDBC URL:** `jdbc:h2:mem:employeedb`
+* **User Name:** `sa`
+* **Password:** `password`
+
+### Initial Data
+
+Upon application startup, the `DataLoader` class (`com.example.employeemanagementsystem.config.DataLoader`) automatically populates the H2 database with essential sample data, demonstrating the relationships:
+* At least **3 departments** are created.
+* At least **25 employees** are generated, including top-level employees, employees assigned to departments, and employees with reporting managers.
+This allows for immediate testing of all API endpoints without manual data creation.
+
+---
+
+## ⚠️ Error Handling
+
+The API provides clear and consistent error responses using a global exception handler (`GlobalExceptionHandler`). Common error scenarios are mapped to appropriate HTTP status codes:
+
+* **`404 Not Found`**: When a requested resource (employee or department) does not exist.
+* **`400 Bad Request`**: For invalid input (e.g., missing required fields, invalid formats due to `@Valid` annotations) or business rule violations (e.g., attempting to delete a department with active employees).
+* **`500 Internal Server Error`**: For unexpected server-side issues.
+
+**Example Error Response Body:**
+
+```json
+{
+  "timestamp": "YYYY-MM-DDTHH:MM:SS.SSSSSS",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Employee not found with ID: 100",
+  "path": "/api/employees/100"
+}
+
 ---
 
 ## 📝 API Endpoints Detailed Documentation
@@ -666,111 +773,3 @@ JSON
   "last": true                 // boolean, true if this is the last page
 }
 ---
----
-
-## 🛠️ Technologies Used
-
-* **Java 17+**: The core programming language.
-* **Spring Boot 3.5.x**: The framework for building robust, stand-alone, production-grade Spring applications.
-* **Spring Data JPA**: For simplified data access and persistence with Hibernate as the JPA provider.
-* **H2 Database**: An in-memory database used for development and testing, easily swappable with external databases like PostgreSQL or MySQL.
-* **Maven**: Dependency management and build automation tool.
-* **Lombok**: Reduces boilerplate code (getters, setters, constructors).
-* **Jakarta Validation (Bean Validation)**: For declarative validation of input data.
-
----
-
-## ⚙️ Setup and Run
-
-Follow these steps to get the application up and running on your local machine:
-
-1.  **Prerequisites:**
-    * **Java Development Kit (JDK) 17 or higher** installed.
-    * **Maven** installed (usually comes bundled with modern IDEs like IntelliJ IDEA).
-    * A good **Integrated Development Environment (IDE)** like IntelliJ IDEA (recommended), VS Code, or Eclipse.
-2.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/7rensenS/employee-management-system.git
-    cd employee-management-system
-    ```
-    *(Remember to replace `<your-username>` with your actual GitHub username where you've pushed the code.)*
-3.  **Build the Project:**
-    Navigate to the project root directory in your terminal and run the Maven build command:
-    ```bash
-    mvn clean install
-    ```
-    This command compiles the code, runs tests, and packages the application.
-4.  **Run the Application:**
-    You can run the Spring Boot application using Maven:
-    ```bash
-    mvn spring-boot:run
-    ```
-    Alternatively, you can run the `EmployeeManagementSystemApplication.java` file directly from your IDE.
-
-    The application will start on `http://localhost:8080`.
-
----
-
-## 💾 Database Details
-
-This project uses an **H2 in-memory database** for simplicity and ease of setup during development and assessment. The database schema is automatically created on startup by Spring Data JPA based on the defined entities (`ddl-auto=update` configured in `application.properties`).
-
-### Database Structure
-
-The core entities are `Department` and `Employee`, mapped to `departments` and `employees` tables respectively.
-
-| Column Name               | Data Type         | Constraints                                  | Description                                    |
-| :------------------------ | :---------------- | :------------------------------------------- | :--------------------------------------------- |
-| `id`                      | `BIGINT`          | `PRIMARY KEY`, `AUTO_INCREMENT`              | Unique identifier for the entity               |
-| `name`                    | `VARCHAR(255)`    | `NOT NULL`, `UNIQUE` (for Department)        | Name of the department or employee             |
-| `creation_date`           | `DATE`            | `NOT NULL` (for Department)                  | Date the department was established            |
-| `head_employee_id`        | `BIGINT`          | `FOREIGN KEY REFERENCES employees(id)` (nullable) | ID of the employee designated as department head |
-| `date_of_birth`           | `DATE`            | `NOT NULL` (for Employee)                    | Employee's date of birth                       |
-| `salary`                  | `DECIMAL(19,2)`   | `NOT NULL` (for Employee)                    | Employee's yearly salary                       |
-| `department_id`           | `BIGINT`          | `FOREIGN KEY REFERENCES departments(id)` (nullable) | ID of the department the employee belongs to   |
-| `address`                 | `VARCHAR(255)`    |                                              | Employee's residential address                 |
-| `role`                    | `VARCHAR(255)`    | `NOT NULL` (for Employee)                    | Employee's job role or title                   |
-| `joining_date`            | `DATE`            | `NOT NULL` (for Employee)                    | Date the employee joined the company           |
-| `yearly_bonus_percentage` | `DOUBLE`          | `NOT NULL` (for Employee)                    | Percentage of yearly bonus (e.g., 5.0 for 5%)  |
-| `reporting_manager_id`    | `BIGINT`          | `FOREIGN KEY REFERENCES employees(id)` (nullable) | ID of the employee's reporting manager         |
-
-*(A `.sql` script for creating these tables is not explicitly provided in the repository, as Spring Data JPA automatically generates the schema based on entities for H2. However, the structure is clearly defined above for reference.)*
-
-### H2 Console
-
-You can access the H2 database console to inspect the data directly:
-
-➡️ **[http://localhost:8080/h2-console](http://localhost:8080/h2-console)**
-
-Use the following credentials to connect:
-* **JDBC URL:** `jdbc:h2:mem:employeedb`
-* **User Name:** `sa`
-* **Password:** `password`
-
-### Initial Data
-
-Upon application startup, the `DataLoader` class (`com.example.employeemanagementsystem.config.DataLoader`) automatically populates the H2 database with essential sample data, demonstrating the relationships:
-* At least **3 departments** are created.
-* At least **25 employees** are generated, including top-level employees, employees assigned to departments, and employees with reporting managers.
-This allows for immediate testing of all API endpoints without manual data creation.
-
----
-
-## ⚠️ Error Handling
-
-The API provides clear and consistent error responses using a global exception handler (`GlobalExceptionHandler`). Common error scenarios are mapped to appropriate HTTP status codes:
-
-* **`404 Not Found`**: When a requested resource (employee or department) does not exist.
-* **`400 Bad Request`**: For invalid input (e.g., missing required fields, invalid formats due to `@Valid` annotations) or business rule violations (e.g., attempting to delete a department with active employees).
-* **`500 Internal Server Error`**: For unexpected server-side issues.
-
-**Example Error Response Body:**
-
-```json
-{
-  "timestamp": "YYYY-MM-DDTHH:MM:SS.SSSSSS",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Employee not found with ID: 100",
-  "path": "/api/employees/100"
-}
