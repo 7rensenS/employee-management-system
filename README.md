@@ -144,7 +144,7 @@ The API provides clear and consistent error responses using a global exception h
 }
 
 ---
-
+### **---**
 ## 📝 API Endpoints Detailed Documentation
 
 All endpoints are served under the base URL `http://localhost:8080`.
