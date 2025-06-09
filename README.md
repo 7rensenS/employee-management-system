@@ -124,27 +124,6 @@ This allows for immediate testing of all API endpoints without manual data creat
 
 ---
 
-## ⚠️ Error Handling
-
-The API provides clear and consistent error responses using a global exception handler (`GlobalExceptionHandler`). Common error scenarios are mapped to appropriate HTTP status codes:
-
-* **`404 Not Found`**: When a requested resource (employee or department) does not exist.
-* **`400 Bad Request`**: For invalid input (e.g., missing required fields, invalid formats due to `@Valid` annotations) or business rule violations (e.g., attempting to delete a department with active employees).
-* **`500 Internal Server Error`**: For unexpected server-side issues.
-
-**Example Error Response Body:**
-
-```json
-{
-  "timestamp": "YYYY-MM-DDTHH:MM:SS.SSSSSS",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Employee not found with ID: 100",
-  "path": "/api/employees/100"
-}
-
----
-### **---**
 ## 📝 API Endpoints Detailed Documentation
 
 All endpoints are served under the base URL `http://localhost:8080`.
@@ -772,4 +751,26 @@ JSON
   "totalPages": 0,             // Total number of available pages
   "last": true                 // boolean, true if this is the last page
 }
+---
+
+## ⚠️ Error Handling
+
+The API provides clear and consistent error responses using a global exception handler (`GlobalExceptionHandler`). Common error scenarios are mapped to appropriate HTTP status codes:
+
+* **`404 Not Found`**: When a requested resource (employee or department) does not exist.
+* **`400 Bad Request`**: For invalid input (e.g., missing required fields, invalid formats due to `@Valid` annotations) or business rule violations (e.g., attempting to delete a department with active employees).
+* **`500 Internal Server Error`**: For unexpected server-side issues.
+
+**Example Error Response Body:**
+
+```json
+{
+  "timestamp": "YYYY-MM-DDTHH:MM:SS.SSSSSS",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Employee not found with ID: 100",
+  "path": "/api/employees/100"
+}
+
+---
 ---
