@@ -40,23 +40,23 @@ This API covers all specified functionalities, including:
 ## 🛠️ Technologies Used
 
 * **Java 17+**: The core programming language.
-* **Spring Boot 3.2.x**: The framework for building robust, stand-alone, production-grade Spring applications.
+* **Spring Boot 3.5.x**: The framework for building robust, stand-alone, production-grade Spring applications.
 * **Spring Data JPA**: For simplified data access and persistence with Hibernate as the JPA provider.
 * **H2 Database**: An in-memory database used for development and testing, easily swappable with external databases like PostgreSQL or MySQL.
 * **Maven**: Dependency management and build automation tool.
 * **Lombok**: Reduces boilerplate code (getters, setters, constructors).
 * **Jakarta Validation (Bean Validation)**: For declarative validation of input data.
-* **SpringDoc OpenAPI (Swagger UI)**: For automatic generation of interactive API documentation.
 
 ---
 
 ## 📁 Project Structure
 
 The project follows a clean, standard Spring Boot layered architecture:
+
 src/main/java/com/example/employeemanagementsystem
-├── config                      # Application-wide configurations (e.g., DataLoader for initial data)
-├── controller                  # REST API endpoints (handles HTTP requests and responses)
-├── dto                         # Data Transfer Objects (DTOs) for API request/response payloads
+├── config                      
+├── controller                 
+├── dto                        
 │   ├── DepartmentCreateRequestDTO.java
 │   ├── DepartmentLookupDTO.java
 │   ├── DepartmentResponseDTO.java
@@ -114,19 +114,6 @@ Follow these steps to get the application up and running on your local machine:
     Alternatively, you can run the `EmployeeManagementSystemApplication.java` file directly from your IDE.
 
     The application will start on `http://localhost:8080`.
-
----
-
-## 📖 API Documentation (Swagger UI)
-
-Once the application is running, you can access the interactive API documentation provided by SpringDoc OpenAPI (Swagger UI) at:
-
-➡️ **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
-
-This interface allows you to:
-* Explore all available API endpoints.
-* Understand the request and response JSON schemas.
-* Test API calls directly from your browser.
 
 ---
 
