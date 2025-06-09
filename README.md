@@ -143,29 +143,32 @@ The API provides clear and consistent error responses using a global exception h
   "message": "Employee not found with ID: 100",
   "path": "/api/employees/100"
 }
-📝 API Endpoints Summary
+
+---
+
+## 📝 API Endpoints Summary
 Here's a quick overview of the main API endpoints. Refer to the Swagger UI for detailed request/response schemas and testing.
 
-Departments
-POST /api/departments - Create a new department.
-GET /api/departments - Get all departments (paginated).
-Query Parameter: ?page={pageNo}&size={pageSize}
-Query Parameter: ?expand=employee (to include assigned employees)
-GET /api/departments/{id} - Get a department by ID.
-Path Variable: {id} (department ID)
-Query Parameter: ?expand=employee (to include assigned employees)
-PUT /api/departments/{id} - Update department details.
-Path Variable: {id} (department ID)
-DELETE /api/departments/{id} - Delete a department.
-Path Variable: {id} (department ID)
+* **`Departments`**:
+POST -- /api/departments - Create a new department.
+GET -- /api/departments - Get all departments (paginated).
+Query Parameter: --  ?page={pageNo}&size={pageSize}
+Query Parameter: --  ?expand=employee (to include assigned employees)
+GET -- /api/departments/{id} - Get a department by ID.
+Path Variable: -- {id} (department ID)
+Query Parameter: -- ?expand=employee (to include assigned employees)
+PUT -- /api/departments/{id} - Update department details.
+Path Variable: -- {id} (department ID)
+DELETE -- /api/departments/{id} - Delete a department.
+Path Variable: -- {id} (department ID)
 Employees
-POST /api/employees - Create a new employee.
-GET /api/employees - Get all employees (paginated).
-Query Parameter: ?page={pageNo}&size={pageSize}
-Query Parameter: ?lookup=true (to list only names and IDs)
-GET /api/employees/{id} - Get an employee by ID.
-Path Variable: {id} (employee ID)
-PUT /api/employees/{id} - Update employee details.
-Path Variable: {id} (employee ID)
-PATCH /api/employees/{id}/department - Update an employee's department.
-Path Variable: {id} (employee ID)
+POST -- /api/employees - Create a new employee.
+GET -- /api/employees - Get all employees (paginated).
+Query Parameter: -- ?page={pageNo}&size={pageSize}
+Query Parameter: -- ?lookup=true (to list only names and IDs)
+GET -- /api/employees/{id} - Get an employee by ID.
+Path Variable: -- {id} (employee ID)
+PUT -- /api/employees/{id} - Update employee details.
+Path Variable: -- {id} (employee ID)
+PATCH -- /api/employees/{id}/department - Update an employee's department.
+Path Variable: -- {id} (employee ID)
